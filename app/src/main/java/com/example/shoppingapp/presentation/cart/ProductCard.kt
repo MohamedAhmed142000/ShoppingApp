@@ -32,22 +32,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.shoppingapp.domain.model.Product
-
 @Composable
 fun ProductCard(
     product: Product,
     onFavoriteClick: () -> Unit,
     onClick: () -> Unit
 ) {
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp)
-            .clickable{onClick()},
+            .height(260.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -59,28 +57,35 @@ fun ProductCard(
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize()
                 )
+
+                IconButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (product.isFavorite)
+                            Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Toggle Favorite",
+                        tint = Color.Red
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = product.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-            Text(
-                text = product.name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyLarge
-            )
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = "${product.price} $",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            IconButton(onClick = onFavoriteClick) {
-                Icon(
-                    imageVector = if (product.isFavorite)
-                        Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = null,
-                    tint = Color.Red
+                Text(
+                    text = "${product.price} $",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

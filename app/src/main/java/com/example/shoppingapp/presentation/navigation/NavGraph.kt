@@ -1,12 +1,16 @@
 package com.example.shoppingapp.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.shoppingapp.presentation.cart.CartScreen
+import com.example.shoppingapp.presentation.cart.CartViewModel
+import com.example.shoppingapp.presentation.favorite.FavoriteScreen
 import com.example.shoppingapp.presentation.home.HomeScreen
 import com.example.shoppingapp.presentation.product_details.ProductDetailsScreen
 
@@ -16,15 +20,19 @@ sealed class Screen(val route: String) {
     object ProductDetails : Screen("details/{productId}") {
         fun createRoute(productId: Int): String = "details/$productId"
     }
+
     object Cart : Screen("cart")
+    object Favorite : Screen("favorite")
 }
 
 // NavGraph الرئيسي
 @Composable
-fun AppNavGraph(navController: NavHostController) {
+fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
+    val cartViewModel: CartViewModel = hiltViewModel()
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Home.route,
+        modifier = modifier
     ) {
         // شاشة الرئيسية
         composable(Screen.Home.route) {
@@ -39,7 +47,14 @@ fun AppNavGraph(navController: NavHostController) {
             })
         ) { backStackEntry ->
             val productId = backStackEntry.arguments?.getInt("productId") ?: -1
-            ProductDetailsScreen(productId = productId, navController = navController)
+            ProductDetailsScreen(
+                productId = productId,
+                navController = navController,
+                cartViewModel = cartViewModel
+            )
+        }
+        composable(Screen.Favorite.route) {
+            FavoriteScreen(navController)
         }
 
         // شاشة السلة

@@ -29,12 +29,12 @@ class ProductRepositoryImpl @Inject constructor(
         emit(updated)
     }
 
-    override suspend fun toggleFavorite(product: Product) {
-        if (product.isFavorite) {
-            favoriteDataSource.removeFavorite(userId, product.id)
-        } else {
-            favoriteDataSource.addFavorite(userId, product.id)
-        }
+    override suspend fun addFavorite(productId: Int) {
+        favoriteDataSource.addFavorite(userId, productId)
+    }
+
+    override suspend fun removeFavorite(productId: Int) {
+        favoriteDataSource.removeFavorite(userId, productId)
     }
 }
 

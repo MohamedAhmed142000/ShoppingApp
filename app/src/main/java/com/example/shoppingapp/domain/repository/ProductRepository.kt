@@ -6,5 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
     fun getAllProducts(): Flow<List<Product>>
-    suspend fun toggleFavorite(product: Product)
+    suspend fun addFavorite(productId: Int)
+    suspend fun removeFavorite(productId: Int)
 }

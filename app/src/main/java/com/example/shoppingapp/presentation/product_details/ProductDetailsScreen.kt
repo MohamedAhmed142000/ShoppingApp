@@ -40,13 +40,14 @@ import com.example.shoppingapp.presentation.cart.CartViewModel
 import com.example.shoppingapp.presentation.home.HomeViewModel
 import com.example.shoppingapp.presentation.navigation.Screen
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailsScreen(
     productId: Int,
     navController: NavController,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    cartViewModel: CartViewModel = viewModel()
+    cartViewModel: CartViewModel // لازم يتبعت من MainActivity أو NavGraph
 ) {
     val product = homeViewModel.products.collectAsState().value.find { it.id == productId }
 
@@ -56,8 +57,10 @@ fun ProductDetailsScreen(
                 TopAppBar(
                     title = { Text(item.name) },
                     actions = {
-                        IconButton(onClick = { navController.navigate(Screen.Cart.route) }) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                        IconButton(onClick = {
+                            navController.navigate(Screen.Cart.route)
+                        }) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "السلة")
                         }
                     }
                 )
@@ -69,50 +72,65 @@ fun ProductDetailsScreen(
                     .padding(padding)
                     .padding(16.dp)
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(item.imageUrl),
-                    contentDescription = null,
+                // صورة + زر المفضلة
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(250.dp)
-                )
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(item.imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    IconButton(
+                        onClick = { homeViewModel.toggleFavorite(item) },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (item.isFavorite)
+                                Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "مفضلة",
+                            tint = Color.Red
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(text = item.name, style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(text = "${item.price} $", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(text = "الفئة: ${item.category}", style = MaterialTheme.typography.labelMedium)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = "وصف المنتج:\n${item.description}", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "وصف المنتج:\n${item.description}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                Button(
+                    onClick = { cartViewModel.addToCart(item) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    IconButton(onClick = {
-                        homeViewModel.toggleFavorite(item)
-                    }) {
-                        Icon(
-                            imageVector = if (item.isFavorite)
-                                Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = null,
-                            tint = Color.Red
-                        )
-                    }
-
-                    Button(onClick = {
-                        cartViewModel.addToCart(item)
-                    }) {
-                        Text("أضف للسلة")
-                    }
+                    Text("أضف إلى السلة")
                 }
             }
         }
     } ?: run {
-        Text("المنتج غير موجود")
+        // المنتج مش موجود
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("المنتج غير موجود", style = MaterialTheme.typography.titleMedium)
+        }
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -51,10 +52,34 @@ class HomeViewModel @Inject constructor(
 
     fun toggleFavorite(product: Product) {
         viewModelScope.launch {
-            repository.toggleFavorite(product)
-            getProducts() // Reload updated list
+            // 1. اعكس الحالة مباشرة
+            val updatedProduct = product.copy(isFavorite = !product.isFavorite)
+
+            // 2. حدث القائمة فورًا في الواجهة
+            _allProducts.update { currentList ->
+                currentList.map {
+                    if (it.id == product.id) updatedProduct else it
+                }
+            }
+
+            // 3. نفّذ الطلب في الخلفية (Firebase)
+            try {
+                if (updatedProduct.isFavorite) {
+                    repository.addFavorite(product.id)
+                } else {
+                    repository.removeFavorite(product.id)
+                }
+            } catch (e: Exception) {
+                // في حالة فشل، ارجع للحالة الأصلية
+                _allProducts.update { currentList ->
+                    currentList.map {
+                        if (it.id == product.id) product else it
+                    }
+                }
+            }
         }
     }
+
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,16 +52,29 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(8.dp)) {
+                .padding(8.dp)
+        ) {
 
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { viewModel.onSearchQueryChanged(it) },
                 label = { Text("ابحث عن منتج") },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "مسح البحث"
+                            )
+                        }
+                    }
+                },
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp)
             )
+
             LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                 items(products) { product ->
                     ProductCard(
