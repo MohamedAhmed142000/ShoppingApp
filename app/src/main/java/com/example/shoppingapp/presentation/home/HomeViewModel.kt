@@ -2,6 +2,7 @@ package com.example.shoppingapp.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shoppingapp.data.remote.firebase.repository.AuthRepository
 import com.example.shoppingapp.domain.model.Product
 import com.example.shoppingapp.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: ProductRepository
+    private val repository: ProductRepository,    private val authRepository: AuthRepository
+
 ) : ViewModel() {
 
     private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
@@ -79,7 +81,9 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
+      suspend fun logout() {
+        authRepository.logout()
+    }
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
     }

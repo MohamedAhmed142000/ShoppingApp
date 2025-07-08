@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,12 +21,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shoppingapp.presentation.cart.ProductCard
 import com.example.shoppingapp.presentation.navigation.Screen
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +36,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
 
     val products by viewModel.products.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
-
+    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -43,6 +46,16 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
                         navController.navigate(Screen.Cart.route)
                     }) {
                         Icon(Icons.Default.ShoppingCart, contentDescription = "السلة")
+                    }
+                    IconButton(onClick = {
+                        scope.launch {
+                            viewModel.logout()
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                            }
+                        }
+                    }) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "تسجيل الخروج")
                     }
                 }
             )
