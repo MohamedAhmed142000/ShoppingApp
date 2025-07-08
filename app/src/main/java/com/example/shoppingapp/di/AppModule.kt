@@ -4,8 +4,11 @@ package com.example.shoppingapp.di
 import com.example.shoppingapp.data.remote.api.ProductApi
 import com.example.shoppingapp.data.remote.firebase.FavoriteRemoteDataSource
 import com.example.shoppingapp.data.remote.firebase.FavoriteRemoteDataSourceImpl
+import com.example.shoppingapp.data.remote.firebase.repository.AuthRepository
+import com.example.shoppingapp.data.remote.firebase.repository.AuthRepositoryImpl
 import com.example.shoppingapp.data.repository.ProductRepositoryImpl
 import com.example.shoppingapp.domain.repository.ProductRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -20,6 +23,17 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        firebaseAuth: FirebaseAuth
+    ): AuthRepository = AuthRepositoryImpl(firebaseAuth)
+
 
     @Provides
     @Singleton

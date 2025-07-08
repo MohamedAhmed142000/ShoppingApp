@@ -28,12 +28,14 @@ class CartViewModel : ViewModel() {
         }
     }
 
-    fun removeFromCart(productId: Int) {
+    fun removeFromCart(productId: CartItem) {
         _cartItems.update { items ->
-            items.filterNot { it.product.id == productId }
+            items.filterNot { it.product.id == productId.product.id }
         }
     }
-
+    fun clearCart() {
+        _cartItems.value = emptyList()
+    }
     fun getTotalPrice(): Double {
         return _cartItems.value.sumOf { it.totalPrice }
     }

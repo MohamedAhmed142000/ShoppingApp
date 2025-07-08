@@ -8,11 +8,15 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.shoppingapp.MainScaffold
 import com.example.shoppingapp.presentation.cart.CartScreen
 import com.example.shoppingapp.presentation.cart.CartViewModel
 import com.example.shoppingapp.presentation.favorite.FavoriteScreen
 import com.example.shoppingapp.presentation.home.HomeScreen
+import com.example.shoppingapp.presentation.login.LoginScreen
 import com.example.shoppingapp.presentation.product_details.ProductDetailsScreen
+import com.example.shoppingapp.presentation.register.RegisterScreen
+import com.example.shoppingapp.presentation.splash.SplashScreen
 
 // تعريف مسارات التنقل
 sealed class Screen(val route: String) {
@@ -23,6 +27,9 @@ sealed class Screen(val route: String) {
 
     object Cart : Screen("cart")
     object Favorite : Screen("favorite")
+    object Login : Screen("login")
+    object Register : Screen("register")
+    object Splash : Screen("splash")
 }
 
 // NavGraph الرئيسي
@@ -31,15 +38,35 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
     val cartViewModel: CartViewModel = hiltViewModel()
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
-        // شاشة الرئيسية
+        composable(Screen.Splash.route) {
+            SplashScreen(navController)
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(navController)
+        }
+        composable(Screen.Login.route) {
+            LoginScreen(navController)
+        }
         composable(Screen.Home.route) {
-            HomeScreen(navController)
+            MainScaffold(navController,cartViewModel) {
+                HomeScreen(navController)
+            }
+        }
+        composable(Screen.Favorite.route) {
+            MainScaffold(navController,cartViewModel) {
+                FavoriteScreen(navController)
+            }
+        }
+        composable(Screen.Cart.route) {
+            MainScaffold(navController,cartViewModel) {
+                CartScreen(navController, cartViewModel)
+            }
         }
 
-        // شاشة تفاصيل المنتج
+        // شاشة تفاصيل المنتج خارج BottomBar
         composable(
             route = Screen.ProductDetails.route,
             arguments = listOf(navArgument("productId") {
@@ -52,14 +79,6 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                 navController = navController,
                 cartViewModel = cartViewModel
             )
-        }
-        composable(Screen.Favorite.route) {
-            FavoriteScreen(navController)
-        }
-
-        // شاشة السلة
-        composable(Screen.Cart.route) {
-            CartScreen()
         }
     }
 }
